@@ -1,0 +1,28 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "ap-northeast-1",
+      "vpc_id": "vpc-816262e4",
+      "subnet_id": "subnet-11ded148",
+      "source_ami": "ami-1a15c77b",
+      "instance_type": "t2.micro",
+      "associate_public_ip_address": true,
+      "ssh_username": "ec2-user",
+      "ssh_timeout": "5m",
+      "ami_name": "packer-builder_amzn-ami-hvm-2016.09.0.20160923-x86_64-gp2 {{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y",
+        "sudo yum install -y wget unzip",
+        "wget https://releases.hashicorp.com/packer/0.10.2/packer_0.10.2_linux_amd64.zip",
+        "unzip packer_0.10.2_linux_amd64.zip",
+        "sudo mv packer /usr/local/bin/"
+      ]
+    }
+  ]
+}

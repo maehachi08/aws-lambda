@@ -1,0 +1,53 @@
+{
+  "variables":{
+    "env_region": "{{ env `REGION` }}",
+    "env_vpc-id": "{{ env `VPC_ID` }}",
+    "env_subnet-id": "{{ env `SUBNET_ID` }}",
+    "env_ami-id": "{{ env `AMI_ID` }}"
+  },
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{ user `env_region` }}",
+      "vpc_id": "{{ user `env_vpc-id` }}",
+      "subnet_id": "{{ user `env_subnet-id` }}",
+      "source_ami": "{{ user `env_ami-id` }}",
+      "instance_type": "t2.micro",
+      "associate_public_ip_address": true,
+      "ssh_username": "ec2-user",
+      "ssh_timeout": "5m",
+      "ami_name": "ITZ-kmaehata-custom_amzn-ami-2016.03.h-amazon-ecs-optimized {{timestamp}}"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "etc/audit/audit.rules",
+      "destination": "/tmp/audit.rules"
+    },
+    {
+      "type": "file",
+      "source": "etc/sysconfig/docker",
+      "destination": "/tmp/docker"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv /tmp/audit.rules /etc/audit/audit.rules",
+        "sudo chown root.root /etc/audit/audit.rules",
+        "sudo chmod 640 /etc/audit/audit.rules",
+        "sudo mv /tmp/docker /etc/sysconfig/docker",
+        "sudo chown root.root /etc/sysconfig/docker",
+        "sudo chmod 644 /etc/sysconfig/docker"
+      ]
+    }
+  ]
+}
